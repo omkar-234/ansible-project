@@ -1,0 +1,7 @@
+---
+- hosts: web
+
+  tasks:
+
+    - name: Check Hostname
+      command: hostname

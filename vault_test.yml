@@ -1,0 +1,11 @@
+---
+- hosts: web
+
+  vars_files:
+    - secret.yml
+
+  tasks:
+
+    - name: Show DB User
+      debug:
+        msg: "DB User is {{ db_user }}"
