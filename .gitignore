@@ -1,3 +1,15 @@
 secret.yml
+# AWS Key — kabhi push nako!
 *.pem
+
+# Vault secrets
+secret.yml
 .vault_pass
+
+# GitHub Runner files — push nako!
+_work/
+runner/
+.runner
+.credentials
+.credentials_rsaparams
+EOF
