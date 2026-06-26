@@ -1,7 +1,12 @@
 ---
-- name: Complete Web Server Setup
+- name: Web server deploy
   hosts: web
   become: yes
-
   roles:
     - webserver
+
+- name: Odoo server deploy
+  hosts: odoo
+  become: yes
+  roles:
+    - odoo

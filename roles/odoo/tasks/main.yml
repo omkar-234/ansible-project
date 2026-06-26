@@ -1,0 +1,70 @@
+---
+- name: Required packages install karo
+  yum:
+    name:
+      - python3
+      - python3-pip
+      - postgresql
+      - postgresql-server
+      - postgresql-devel
+      - python3-psycopg2
+      - git
+      - nodejs
+    state: present
+
+- name: PostgreSQL initialize karo
+  command: postgresql-setup --initdb
+  args:
+    creates: /var/lib/pgsql/data/postgresql.conf
+
+- name: PostgreSQL start ani enable karo
+  service:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Odoo system user banav
+  user:
+    name: odoo
+    system: yes
+    home: /opt/odoo
+    shell: /bin/bash
+
+- name: Odoo source code download karo
+  git:
+    repo: https://github.com/odoo/odoo.git
+    dest: /opt/odoo/odoo
+    version: "{{ odoo_version }}"
+    depth: 1
+
+- name: Odoo Python requirements install karo
+  pip:
+    requirements: /opt/odoo/odoo/requirements.txt
+    executable: pip3
+
+- name: Log directory banav
+  file:
+    path: /var/log/odoo
+    state: directory
+    owner: odoo
+    group: odoo
+
+- name: Odoo config file banav
+  template:
+    src: odoo.conf.j2
+    dest: /etc/odoo.conf
+    owner: odoo
+    mode: '0640'
+  notify: Restart Odoo
+
+- name: Odoo systemd service banav
+  template:
+    src: odoo.service.j2
+    dest: /etc/systemd/system/odoo.service
+  notify: Restart Odoo
+
+- name: Odoo start ani enable karo
+  service:
+    name: odoo
+    state: started
+    enabled: yes
