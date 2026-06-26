@@ -12,6 +12,16 @@
       - nodejs
     state: present
 
+- name: Odoo repo add karo
+  get_url:
+    url: https://nightly.odoo.com/14.0/nightly/rpm/odoo.repo
+    dest: /etc/yum.repos.d/odoo.repo
+
+- name: Odoo install karo
+  yum:
+    name: odoo
+    state: present
+
 - name: PostgreSQL initialize karo
   command: postgresql-setup --initdb
   args:
@@ -23,24 +33,18 @@
     state: started
     enabled: yes
 
-- name: Odoo system user banav
-  user:
-    name: odoo
-    system: yes
-    home: /opt/odoo
-    shell: /bin/bash
+- name: PostgreSQL odoo user banav
+  become_user: postgres
+  postgresql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    role_attr_flags: CREATEDB
 
-- name: Odoo source code download karo
-  git:
-    repo: https://github.com/odoo/odoo.git
-    dest: /opt/odoo/odoo
-    version: "{{ odoo_version }}"
-    depth: 1
-
-- name: Odoo Python requirements install karo
-  pip:
-    requirements: /opt/odoo/odoo/requirements.txt
-    executable: pip3
+- name: PostgreSQL odoo database banav
+  become_user: postgres
+  postgresql_db:
+    name: "{{ db_name }}"
+    owner: "{{ db_user }}"
 
 - name: Log directory banav
   file:
