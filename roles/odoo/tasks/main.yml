@@ -10,9 +10,13 @@
       - git
       - nodejs
       - gcc
+      - gcc-c++
+      - make
       - libffi-devel
       - openssl-devel
       - python3-devel
+      - openldap-devel
+      - sassc
     state: present
 
 - name: PostgreSQL initialize karo
@@ -41,6 +45,12 @@
     depth: 1
     single_branch: yes
 
+- name: requirements.txt madhe psycopg2 fix karo
+  replace:
+    path: /opt/odoo/odoo/requirements.txt
+    regexp: 'psycopg2==2.8.5'
+    replace: 'psycopg2-binary==2.9.9'
+
 - name: psycopg2-binary install karo
   pip:
     name: psycopg2-binary
@@ -50,7 +60,7 @@
   pip:
     requirements: /opt/odoo/odoo/requirements.txt
     executable: pip3
-    extra_args: "--ignore-requires-python --no-deps"
+    extra_args: "--ignore-requires-python --no-deps --ignore-installed"
 
 - name: Log directory banav
   file:
