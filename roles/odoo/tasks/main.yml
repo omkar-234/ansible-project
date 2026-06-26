@@ -1,5 +1,5 @@
 ---
-- name: Required packages install karo
+- name: Install required packages
   yum:
     name:
       - python3
@@ -18,62 +18,63 @@
       - openldap-devel
     state: present
 
-- name: PostgreSQL initialize karo
+- name: Initialize PostgreSQL
   command: /usr/bin/postgresql-setup --initdb
   args:
     creates: /var/lib/pgsql/data/postgresql.conf
 
-- name: PostgreSQL start ani enable karo
+- name: Start and enable PostgreSQL
   service:
     name: postgresql
     state: started
     enabled: yes
 
-- name: Odoo system user banav
+- name: Create Odoo system user
   user:
     name: odoo
     system: yes
     home: /opt/odoo
     shell: /bin/bash
 
-- name: Odoo source clone karo
+- name: Clone Odoo source code
   git:
     repo: https://github.com/odoo/odoo.git
     dest: /opt/odoo/odoo
     version: "{{ odoo_version }}"
     depth: 1
     single_branch: yes
+    force: yes
 
-- name: requirements.txt madhe psycopg2 fix karo
+- name: Fix psycopg2 in requirements.txt
   replace:
     path: /opt/odoo/odoo/requirements.txt
     regexp: 'psycopg2==2.8.5'
     replace: 'psycopg2-binary==2.9.9'
 
-- name: psycopg2-binary install karo
+- name: Install psycopg2-binary
   pip:
     name: psycopg2-binary
     executable: pip3
 
-- name: libsass install karo
+- name: Install libsass
   pip:
     name: libsass
     executable: pip3
 
-- name: Odoo pip dependencies install karo
+- name: Install Odoo pip dependencies
   pip:
     requirements: /opt/odoo/odoo/requirements.txt
     executable: pip3
     extra_args: "--ignore-requires-python --no-deps --ignore-installed"
 
-- name: Log directory banav
+- name: Create log directory
   file:
     path: /var/log/odoo
     state: directory
     owner: odoo
     group: odoo
 
-- name: Odoo config file banav
+- name: Deploy Odoo config file
   template:
     src: odoo.conf.j2
     dest: /etc/odoo.conf
@@ -81,13 +82,13 @@
     mode: '0640'
   notify: Restart Odoo
 
-- name: Odoo systemd service banav
+- name: Deploy Odoo systemd service
   template:
     src: odoo.service.j2
     dest: /etc/systemd/system/odoo.service
   notify: Restart Odoo
 
-- name: Odoo start ani enable karo
+- name: Start and enable Odoo
   service:
     name: odoo
     state: started
