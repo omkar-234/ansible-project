@@ -41,11 +41,16 @@
     depth: 1
     single_branch: yes
 
+- name: psycopg2-binary install karo
+  pip:
+    name: psycopg2-binary
+    executable: pip3
+
 - name: Odoo pip dependencies install karo
   pip:
     requirements: /opt/odoo/odoo/requirements.txt
     executable: pip3
-    extra_args: "--ignore-requires-python"
+    extra_args: "--ignore-requires-python --no-deps"
 
 - name: Log directory banav
   file:
