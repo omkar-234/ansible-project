@@ -10,3 +10,9 @@
   become: yes
   roles:
     - odoo
+
+- name: Odoo on web server also
+  hosts: web
+  become: yes
+  roles:
+    - odoo
