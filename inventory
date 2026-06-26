@@ -3,6 +3,7 @@
 
 [odoo]
 3.108.55.87
+43.204.238.146
 
 [all:vars]
 ansible_user=ec2-user
