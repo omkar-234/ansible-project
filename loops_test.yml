@@ -1,0 +1,31 @@
+---
+- name: Loops Practice
+  hosts: web
+  become: yes
+
+  tasks:
+    - name: Multiple packages install karo
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - git
+        - wget
+        - unzip
+
+    - name: Multiple files banav
+      file:
+        path: "/tmp/{{ item }}"
+        state: touch
+      loop:
+        - file1.txt
+        - file2.txt
+        - file3.txt
+
+    - name: Output print karo
+      shell: ls /tmp/file*.txt
+      register: files_output
+
+    - name: Result dakhvao
+      debug:
+        msg: "{{ files_output.stdout }}"
