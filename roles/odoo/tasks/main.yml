@@ -16,7 +16,6 @@
       - openssl-devel
       - python3-devel
       - openldap-devel
-      - sassc
     state: present
 
 - name: PostgreSQL initialize karo
@@ -54,6 +53,11 @@
 - name: psycopg2-binary install karo
   pip:
     name: psycopg2-binary
+    executable: pip3
+
+- name: libsass install karo
+  pip:
+    name: libsass
     executable: pip3
 
 - name: Odoo pip dependencies install karo
