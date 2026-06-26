@@ -61,6 +61,11 @@
     name: libsass
     executable: pip3
 
+- name: Install certifi
+  pip:
+    name: certifi
+    executable: pip3
+
 - name: Install Odoo pip dependencies
   pip:
     requirements: /opt/odoo/odoo/requirements.txt
