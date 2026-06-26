@@ -40,20 +40,28 @@
     name: postgresql
     state: started
     enabled: yes
-  notify: Restart PostgreSQL
+
+- name: Restart PostgreSQL after auth fix
+  service:
+    name: postgresql
+    state: restarted
 
 - name: Create Odoo PostgreSQL user
+  become: yes
   become_user: postgres
   postgresql_user:
     name: odoo
     password: odoo123
     role_attr_flags: CREATEDB
+    login_unix_socket: /var/run/postgresql
 
 - name: Create Odoo PostgreSQL database
+  become: yes
   become_user: postgres
   postgresql_db:
     name: odoodb
     owner: odoo
+    login_unix_socket: /var/run/postgresql
 
 - name: Create Odoo system user
   user:
