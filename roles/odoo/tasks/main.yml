@@ -23,23 +23,36 @@
   args:
     creates: /var/lib/pgsql/data/postgresql.conf
 
-- name: Allow postgres peer authentication
+- name: Ensure postgres uses peer authentication
   lineinfile:
     path: /var/lib/pgsql/data/pg_hba.conf
-    insertbefore: '^local'
+    regexp: '^local\s+all\s+postgres'
     line: 'local   all             postgres                                peer'
 
-- name: Fix PostgreSQL local authentication
-  replace:
+- name: Ensure all local users use md5 authentication
+  lineinfile:
     path: /var/lib/pgsql/data/pg_hba.conf
-    regexp: '^local\s+all\s+all\s+peer'
-    replace: 'local   all             all                                     md5'
+    regexp: '^local\s+all\s+all'
+    line: 'local   all             all                                     md5'
 
 - name: Fix PostgreSQL host authentication
   replace:
     path: /var/lib/pgsql/data/pg_hba.conf
     regexp: 'ident'
     replace: 'md5'
+
+- name: Move postgres rule above local all rule
+  shell: |
+    awk '
+    /^local[[:space:]]+all[[:space:]]+postgres/ { p=$0; next }
+    /^local[[:space:]]+all[[:space:]]+all/ {
+      print p
+      print
+      next
+    }
+    { print }
+    ' /var/lib/pgsql/data/pg_hba.conf > /tmp/pg_hba.conf
+    mv /tmp/pg_hba.conf /var/lib/pgsql/data/pg_hba.conf
 
 - name: Restart PostgreSQL
   service:
@@ -155,8 +168,6 @@
   systemd:
     daemon_reload: yes
 
-# ------------------- NEW TASKS -------------------
-
 - name: Check if Odoo database is initialized
   become: yes
   become_user: postgres
@@ -176,8 +187,6 @@
     -i base
     --stop-after-init
   when: db_init.stdout != "1"
-
-# -------------------------------------------------
 
 - name: Start and enable Odoo
   service:
