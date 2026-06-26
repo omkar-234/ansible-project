@@ -1,7 +1,11 @@
 ---
-# handlers file for /home/omkarbachche8022/ansible-project/roles/odoo
 - name: Restart Odoo
   systemd:
     name: odoo
     state: restarted
     daemon_reload: yes
+
+- name: Restart PostgreSQL
+  service:
+    name: postgresql
+    state: restarted

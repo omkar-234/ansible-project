@@ -23,11 +23,30 @@
   args:
     creates: /var/lib/pgsql/data/postgresql.conf
 
+- name: Fix PostgreSQL authentication
+  replace:
+    path: /var/lib/pgsql/data/pg_hba.conf
+    regexp: 'ident'
+    replace: 'md5'
+
 - name: Start and enable PostgreSQL
   service:
     name: postgresql
     state: started
     enabled: yes
+
+- name: Create Odoo PostgreSQL user
+  become_user: postgres
+  postgresql_user:
+    name: odoo
+    password: odoo123
+    role_attr_flags: CREATEDB
+
+- name: Create Odoo PostgreSQL database
+  become_user: postgres
+  postgresql_db:
+    name: odoodb
+    owner: odoo
 
 - name: Create Odoo system user
   user:
@@ -36,6 +55,11 @@
     home: /opt/odoo
     shell: /bin/bash
 
+- name: Check if Odoo already cloned
+  stat:
+    path: /opt/odoo/odoo/odoo-bin
+  register: odoo_cloned
+
 - name: Clone Odoo source code
   git:
     repo: https://github.com/odoo/odoo.git
@@ -43,7 +67,8 @@
     version: "{{ odoo_version }}"
     depth: 1
     single_branch: yes
-    force: yes
+    force: no
+  when: not odoo_cloned.stat.exists
 
 - name: Fix psycopg2 in requirements.txt
   replace:
@@ -66,11 +91,23 @@
     name: certifi
     executable: pip3
 
+- name: Check pip already done
+  stat:
+    path: /opt/odoo/.pip_done
+  register: pip_done
+
 - name: Install Odoo pip dependencies
   pip:
     requirements: /opt/odoo/odoo/requirements.txt
     executable: pip3
     extra_args: "--ignore-requires-python --no-deps --ignore-installed"
+  when: not pip_done.stat.exists
+
+- name: Mark pip as done
+  file:
+    path: /opt/odoo/.pip_done
+    state: touch
+  when: not pip_done.stat.exists
 
 - name: Create log directory
   file:
