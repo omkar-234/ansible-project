@@ -16,13 +16,13 @@
     state: present
 
 - name: PostgreSQL initialize karo
-  command: postgresql-setup --initdb
+  command: /usr/bin/postgresql-setup --initdb
   args:
-    creates: /var/lib/pgsql15/data/postgresql.conf
+    creates: /var/lib/pgsql/data/postgresql.conf
 
 - name: PostgreSQL start ani enable karo
   service:
-    name: postgresql15
+    name: postgresql
     state: started
     enabled: yes
 
