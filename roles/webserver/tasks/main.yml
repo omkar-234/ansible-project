@@ -3,12 +3,17 @@
   yum:
     name: httpd
     state: present
-  notify: Restart Apache
+
+- name: Change Apache port to 8080
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^Listen 80'
+    line: 'Listen 8080'
 
 - name: Start Apache
   service:
     name: httpd
-    state: started
+    state: restarted
     enabled: yes
 
 - name: Deploy custom homepage
@@ -17,4 +22,3 @@
     dest: /var/www/html/index.html
     owner: apache
     mode: '0644'
-  notify: Restart Apache
