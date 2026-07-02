@@ -64,7 +64,7 @@
   become: yes
   become_user: postgres
   shell: |
-    psql -d postgres <<'EOF'
+    psql -d postgres <<'PSQL'
     DO $$
     BEGIN
       IF NOT EXISTS (
@@ -74,7 +74,7 @@
       END IF;
     END
     $$;
-    EOF
+    PSQL
 
 - name: Create Odoo PostgreSQL database
   become: yes
@@ -193,3 +193,7 @@
     name: odoo
     state: started
     enabled: yes
+
+- name: Show Odoo Login URL
+  debug:
+    msg: "Odoo Successfully Deployed! Login at: http://{{ ansible_host }}:8069/web/login"

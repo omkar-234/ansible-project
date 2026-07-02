@@ -1,11 +1,15 @@
 [web]
-65.2.79.5
-15.207.14.253
+13.204.85.83
+13.203.203.140
 
 [odoo]
-65.2.79.5
-15.207.14.253
+13.204.85.83
+13.203.203.140
 
-[all:vars]
+[web:vars]
 ansible_user=ec2-user
-ansible_ssh_private_key_file=/home/ec2-user/actions-runner-ansible/mumbaiPPK-key.pem
+ansible_ssh_private_key_file=./mumbaiPPK-key.pem
+
+[odoo:vars]
+ansible_user=ec2-user
+ansible_ssh_private_key_file=./mumbaiPPK-key.pem
